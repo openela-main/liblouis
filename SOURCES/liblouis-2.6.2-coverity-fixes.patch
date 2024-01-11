@@ -1,0 +1,82 @@
+diff -urN liblouis-2.6.2.new/liblouis/compileTranslationTable.c liblouis-2.6.2/liblouis/compileTranslationTable.c
+--- liblouis-2.6.2.new/liblouis/compileTranslationTable.c	2020-02-25 09:58:32.322000000 +0000
++++ liblouis-2.6.2/liblouis/compileTranslationTable.c	2020-03-02 09:20:23.017000000 +0000
+@@ -1517,9 +1517,10 @@
+ 		}
+ 	      in++;
+ 	    }
+-	  if (out >= MAXSTRING)
++	  if (out >= MAXSTRING - 1)
+ 	    {
+-	      result->length = out;
++	      compileError(nested, "Token too long");
++	      result->length = MAXSTRING - 1;
+ 	      return 1;
+ 	    }
+ 	  result->chars[out++] = (widechar) ch;
+@@ -1533,15 +1534,16 @@
+       utf32 = ch & (0XFF - first0Bit[numBytes]);
+       for (k = 0; k < numBytes; k++)
+ 	{
+-	  if (in >= MAXSTRING)
++	  if (in >= MAXSTRING - 1)
+ 	    break;
+ 	  if (token->chars[in] < 128 || (token->chars[in] & 0x0040))
+ 	    {
+ 	      compileWarning (nested, "invalid UTF-8. Assuming Latin-1.");
+ 	      result->chars[out++] = token->chars[lastIn];
+-              if (out >= MAXSTRING)
++              if (out >= MAXSTRING - 1)
+                 {
+-                  result->length = out;
++                  compileError(nested, "Token too long");
++                  result->length = lastOutSize;
+                   return 1;
+                 }
+ 	      in = lastIn + 1;
+@@ -1552,8 +1554,9 @@
+       if (CHARSIZE == 2 && utf32 > 0xffff)
+ 	utf32 = 0xffff;
+       result->chars[out++] = (widechar) utf32;
+-      if (out >= MAXSTRING)
++      if (out >= MAXSTRING - 1)
+ 	{
++	  compileError(nested, "Token too long");
+ 	  result->length = lastOutSize;
+ 	  return 1;
+ 	}
+@@ -1823,6 +1826,7 @@
+       if (!(ch->attributes & CTC_Letter))
+ 	{
+ 	  compileError (nested, "a name may contain only letters");
++	  free(nameRule);
+ 	  return 0;
+ 	}
+       nameRule->name[k] = name->chars[k];
+@@ -2856,7 +2860,7 @@
+       passLinepos = 0;
+       while (passLinepos <= endTest)
+ 	{
+-        if (passIC >= MAXSTRING) {
++        if (passIC >= MAXSTRING - 5) {
+           compileError(passNested, "Test part in multipass operand too long");
+           return 0;
+ 	  }
+@@ -3055,7 +3059,7 @@
+       while (passLinepos < passLine.length &&
+ 	     passLine.chars[passLinepos] > 32)
+ 	{
+-        if (passIC >= MAXSTRING) {
++        if (passIC >= MAXSTRING - 2) {
+           compileError(passNested, "Action part in multipass operand too long");
+           return 0;
+           }
+@@ -4229,7 +4233,7 @@
+ 	      if (ruleDots.chars[0] == '#')
+ 		ruleDots.length = ruleDots.chars[0] = 0;
+ 	      else if (ruleDots.chars[0] == '\\' && ruleDots.chars[1] == '#')
+-		memcpy (&ruleDots.chars[0], &ruleDots.chars[1],
++		memmove (&ruleDots.chars[0], &ruleDots.chars[1],
+ 			ruleDots.length-- * CHARSIZE);
+ 	    }
+ 	}
