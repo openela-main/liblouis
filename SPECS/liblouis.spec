@@ -12,7 +12,7 @@
 
 Name:           liblouis
 Version:        2.6.2
-Release:        21%{?dist}
+Release:        23%{?dist}
 Summary:        Braille translation and back-translation library
 
 Group:          System Environment/Libraries
@@ -35,6 +35,8 @@ Patch4:         liblouis-2.6.2-CVE-2018-11685.patch
 Patch5:         liblouis-2.6.2-CVE-2018-12085.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1602585
 Patch6:         liblouis-2.6.2-coverity-fixes.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1588626
+Patch7:         liblouis-2.6.2-CVE-2018-11683.patch
 
 BuildRequires:  chrpath
 BuildRequires:  help2man
@@ -139,6 +141,7 @@ This package provides the documentation for liblouis.
 %patch4 -p1
 %patch5 -p1
 %patch6 -p1
+%patch7 -p1
 
 # For patch0
 autoreconf -fi
@@ -233,6 +236,12 @@ fi
 
 
 %changelog
+* Tue Jun 20 2023 Tomas Popela <tpopela@redhat.com> - 2.6.2-23
+- Resolves: RHEL-593 Bump the release to fix the upgrade path
+
+* Sat May 16 2020 David King <dking@redhat.com> - 2.6.2-22
+- Fix CVE-2018-11683 (#1588626)
+
 * Mon Mar 02 2020 David King <dking@redhat.com> - 2.6.2-21
 - A further Coverity fix (#1602585)
 
