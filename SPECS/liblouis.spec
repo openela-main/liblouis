@@ -3,12 +3,18 @@
 
 Name:           liblouis
 Version:        3.16.1
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Braille translation and back-translation library
 
 License:        LGPLv3+
 URL:            http://liblouis.org
 Source0:        https://github.com/%{name}/%{name}/releases/download/v%{version}/%{name}-%{version}.tar.gz
+# https://bugzilla.redhat.com/show_bug.cgi?id=2181151
+Patch0:         liblouis-3.16.1-fix-CVE-2023-26767.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=2181151
+Patch1:         liblouis-3.16.1-fix-CVE-2023-26768.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=2181149
+Patch2:         liblouis-3.16.1-fix-CVE-2023-26769.patch
 
 BuildRequires:  chrpath
 BuildRequires:  gcc
@@ -81,7 +87,7 @@ This package provides the documentation for liblouis.
 
 
 %prep
-%setup -q
+%autosetup -p1
 
 
 %build
@@ -143,6 +149,11 @@ done
 
 
 %changelog
+* Mon Apr 03 2023 David King <amigadave@amigadave.com> - 3.16.1-5
+- Fix CVE-2023-26767 (#2181147)
+- Fix CVE-2023-26768 (#2181151)
+- Fix CVE-2023-26769 (#2181149)
+
 * Mon Aug 09 2021 Mohan Boddu <mboddu@redhat.com> - 3.16.1-4
 - Rebuilt for IMA sigs, glibc 2.34, aarch64 flags
   Related: rhbz#1991688
